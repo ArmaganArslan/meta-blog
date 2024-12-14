@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Önce mevcut test kullanıcısını bulalım veya oluşturalım
+  // Mevcut test kullanıcısını oluştur
   const testUser = await prisma.user.upsert({
     where: {
       email: "test@example.com",
@@ -16,7 +16,7 @@ async function main() {
     }
   });
 
-  // Mevcut postları temizleyelim
+  // Mevcut postları temizle
   await prisma.post.deleteMany({
     where: {
       authorId: testUser.id

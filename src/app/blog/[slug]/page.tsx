@@ -35,10 +35,10 @@ interface ExtendedPost extends Post {
   };
 }
 
-// Page component'ini async olarak işaretliyoruz
+// Page component'ini async olarak işaretle
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   try {
-    // params'ı await ile çözümlüyoruz
+    // params'ı await ile çözümle
     const resolvedParams = await params;
     
     const post = await prisma.post.findUnique({
