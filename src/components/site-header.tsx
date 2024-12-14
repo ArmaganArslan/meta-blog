@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function SiteHeader() {
   const { theme } = useTheme();
@@ -80,8 +81,25 @@ export default function SiteHeader() {
 
 // Mobile Menu Component
 function MobileMenu({ logoUrl }: { logoUrl: string }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleRandomPost = async () => {
+    try {
+      const response = await fetch("/api/posts/random");
+      const post = await response.json();
+      
+      if (post.id) {
+        router.push(`/blog/${post.id}`);
+        setOpen(false); // Menüyü kapat
+      }
+    } catch (error) {
+      console.error("Rastgele post getirilirken hata oluştu:", error);
+    }
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-5 w-5" />
@@ -106,10 +124,16 @@ function MobileMenu({ logoUrl }: { logoUrl: string }) {
           </div>
         </div>
         <nav className="flex flex-col space-y-4">
-          <Link href="/" className="text-sm font-medium">Home</Link>
-          <Link href="/blog" className="text-sm font-medium">Blog</Link>
-          <Link href="/pages" className="text-sm font-medium">Pages</Link>
-          <Link href="/contact" className="text-sm font-medium">Contact</Link>
+          <Link href="/" className="text-sm font-medium" onClick={() => setOpen(false)}>Home</Link>
+          <Link href="/blog" className="text-sm font-medium" onClick={() => setOpen(false)}>Blog</Link>
+          <button 
+            onClick={handleRandomPost}
+            className="text-sm font-medium text-left hover:text-primary transition-colors"
+          >
+            Single Post
+          </button>
+          <Link href="/pages" className="text-sm font-medium" onClick={() => setOpen(false)}>Pages</Link>
+          <Link href="/contact" className="text-sm font-medium" onClick={() => setOpen(false)}>Contact</Link>
           <SearchBar />
           <ThemeToggle />
         </nav>
