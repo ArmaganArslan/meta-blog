@@ -14,6 +14,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 export default function SiteHeader() {
   const { theme } = useTheme();
@@ -33,11 +34,16 @@ export default function SiteHeader() {
           {/* Logo - Sol taraf */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img 
-                src={logoUrl}
-                alt="MetaBlog Icon" 
-                className="h-8" 
-              />
+              <div className="relative h-8 w-8">
+                <Image 
+                  src={logoUrl}
+                  alt="MetaBlog Icon"
+                  fill
+                  sizes="32px"
+                  priority
+                  className="object-contain"
+                />
+              </div>
               <div className="flex items-center">
                 <span className="text-xl font-light text-foreground">Meta</span>
                 <span className="text-xl font-bold text-foreground">Blog</span>
@@ -82,7 +88,23 @@ function MobileMenu({ logoUrl }: { logoUrl: string }) {
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right">
+      <SheetContent title="Mobil Menü" side="right">
+        <div className="flex items-center mb-6">
+          <div className="relative h-8 w-8">
+            <Image 
+              src={logoUrl}
+              alt="MetaBlog Icon"
+              fill
+              sizes="32px"
+              priority
+              className="object-contain"
+            />
+          </div>
+          <div className="flex items-center ml-2">
+            <span className="text-xl font-light">Meta</span>
+            <span className="text-xl font-bold">Blog</span>
+          </div>
+        </div>
         <nav className="flex flex-col space-y-4">
           <Link href="/" className="text-sm font-medium">Home</Link>
           <Link href="/blog" className="text-sm font-medium">Blog</Link>

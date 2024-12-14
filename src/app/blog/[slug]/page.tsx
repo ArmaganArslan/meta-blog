@@ -8,9 +8,9 @@ import { Footer } from "@/components/footer";
 import type { PostContent, Post } from '@/lib/types';
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Statik sayfaları oluşturmak için gerekli olan fonksiyon
@@ -35,11 +35,15 @@ interface ExtendedPost extends Post {
   };
 }
 
+// Page component'ini async olarak işaretliyoruz
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   try {
+    // params'ı await ile çözümlüyoruz
+    const resolvedParams = await params;
+    
     const post = await prisma.post.findUnique({
       where: {
-        id: params.slug,
+        id: resolvedParams.slug,
       },
       include: {
         author: true,
