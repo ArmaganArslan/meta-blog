@@ -4,6 +4,8 @@ import { AdvertisementSection } from "@/components/advertisement-section";
 import { prisma } from "@/lib/prisma";
 import { BlogList } from "@/components/blog-list";
 
+export const revalidate = 0; // Her istekte yeni veriyi çek
+
 export default async function Home() {
   const posts = await prisma.post.findMany({
     include: {

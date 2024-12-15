@@ -5,6 +5,8 @@ import { HeroSection } from "@/components/blog-hero";
 import { AdvertisementSection } from "@/components/advertisement-section";
 import { BlogList } from "@/components/blog-list";
 
+export const revalidate = 0; // Her istekte yeni veriyi çek
+
 export default async function BlogPage() {
   try {
     // Tüm blog yazılarını ve yazarlarını getir
