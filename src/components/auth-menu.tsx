@@ -16,14 +16,14 @@ export function AuthMenu() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return <Button variant="ghost" size="sm" disabled>Yükleniyor...</Button>;
+    return <Button variant="ghost" size="sm" disabled>Loading...</Button>;
   }
 
   if (status === "unauthenticated") {
     return (
       <Button variant="ghost" size="sm" onClick={() => signIn()}>
         <User className="mr-2 h-4 w-4" />
-        Giriş Yap
+        Sign In
       </Button>
     );
   }
@@ -64,7 +64,7 @@ export function AuthMenu() {
           onClick={() => signOut()}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Çıkış Yap
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

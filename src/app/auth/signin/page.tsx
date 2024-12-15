@@ -13,9 +13,9 @@ export default function SignIn() {
       <main className="flex min-h-screen flex-col items-center justify-center p-4">
         <Card className="w-full max-w-md p-6 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold">Hoş Geldiniz</h1>
+            <h1 className="text-2xl font-bold">Welcome</h1>
             <p className="text-muted-foreground">
-              Devam etmek için giriş yapın
+              Sign in to continue
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default function SignIn() {
                 onClick={() => signIn("github", { callbackUrl: "/" })}
               >
                 <Github className="mr-2 h-4 w-4" />
-                GitHub ile devam et
+                Continue with GitHub
               </Button>
             </motion.div>
             
@@ -44,7 +44,7 @@ export default function SignIn() {
                 onClick={() => signIn("google", { callbackUrl: "/" })}
               >
                 <Mail className="mr-2 h-4 w-4" />
-                Google ile devam et
+                Continue with Google
               </Button>
             </motion.div>
           </div>
