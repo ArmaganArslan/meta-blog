@@ -87,6 +87,24 @@ export const authOptions: NextAuthOptions = {
             email: profile?.email || user.email,
           },
         });
+      } else {
+        const existingAccount = await prisma.account.findFirst({
+          where: {
+            userId: user.id,
+            provider: "credentials",
+          },
+        });
+
+        if (!existingAccount) {
+          await prisma.account.create({
+            data: {
+              userId: user.id,
+              type: "credentials",
+              provider: "credentials",
+              providerAccountId: user.id,
+            },
+          });
+        }
       }
 
       const existingSession = await prisma.session.findFirst({
