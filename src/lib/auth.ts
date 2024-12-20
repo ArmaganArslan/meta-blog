@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
             data: {
               sessionToken: sessionToken,
               userId: user.id,
-              expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 saat
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
             },
           });
         } catch (error) {
@@ -92,12 +92,29 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account }) {
-      if (account?.provider === "credentials") {
-        return true;
-      }
+      try {
+        if (account?.provider === "credentials") {
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              userId: user.id,
+              provider: "credentials",
+            },
+          });
 
-      if (account) {
-        try {
+          if (!existingAccount) {
+            await prisma.account.create({
+              data: {
+                userId: user.id,
+                type: "credentials",
+                provider: "credentials",
+                providerAccountId: user.id,
+              },
+            });
+          }
+          return true;
+        }
+
+        if (account) {
           const existingAccount = await prisma.account.findFirst({
             where: {
               userId: user.id,
@@ -119,13 +136,12 @@ export const authOptions: NextAuthOptions = {
               },
             });
           }
-          return true;
-        } catch (error) {
-          console.error("Error in signIn callback:", error);
-          return false;
         }
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
       }
-      return true;
     },
   },
   pages: {
