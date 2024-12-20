@@ -10,6 +10,7 @@ MetaBlog, Next.js 14 ve TypeScript ile geliştirilmiş modern bir blog platformu
 - 📱 Tam responsive tasarım
 - ✨ Framer Motion animasyonları
 - 🔐 NextAuth ile GitHub ve Google OAuth Giriş
+- 📊 tRPC ile type-safe API iletişimi
 
 ## 🖼️ Ekran Görüntüleri
 
