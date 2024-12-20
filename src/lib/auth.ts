@@ -5,14 +5,13 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { randomUUID } from "crypto";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt"
-  },
-  pages: {
-    signIn: "/auth/login",
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   providers: [
     GitHubProvider({
@@ -60,53 +59,77 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (user) {
+    async jwt({ token, user, account, trigger }) {
+      if (trigger === "signIn" && user) {
+        const sessionToken = randomUUID();
+        
         token.id = user.id;
-      }
-      if (account) {
-        token.accessToken = account.access_token;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
+        
+        try {
+          await prisma.session.create({
+            data: {
+              sessionToken: sessionToken,
+              userId: user.id,
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 saat
+            },
+          });
+        } catch (error) {
+          console.error("Session creation error:", error);
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
       }
       return session;
     },
-    async signIn({ user, account, profile }) {
-      if (!account) {
-        account = {
-          provider: "credentials",
-          type: "credentials",
-          providerAccountId: user.id,
-        };
+    async signIn({ user, account }) {
+      if (account?.provider === "credentials") {
+        return true;
       }
 
-      const existingAccount = await prisma.account.findFirst({
-        where: {
-          userId: user.id,
-          provider: account.provider,
-        },
-      });
+      if (account) {
+        try {
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              userId: user.id,
+              provider: account.provider,
+            },
+          });
 
-      if (!existingAccount) {
-        await prisma.account.create({
-          data: {
-            userId: user.id,
-            type: account.type,
-            provider: account.provider,
-            providerAccountId: account.providerAccountId || user.id,
-            access_token: account.access_token,
-            token_type: account.token_type,
-            scope: account.scope,
-            expires_at: account.expires_at,
-          },
-        });
+          if (!existingAccount) {
+            await prisma.account.create({
+              data: {
+                userId: user.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                token_type: account.token_type,
+                scope: account.scope,
+                expires_at: account.expires_at,
+              },
+            });
+          }
+          return true;
+        } catch (error) {
+          console.error("Error in signIn callback:", error);
+          return false;
+        }
       }
-
       return true;
     },
   },
+  pages: {
+    signIn: "/auth/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }; 
