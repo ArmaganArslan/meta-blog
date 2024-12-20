@@ -26,9 +26,9 @@ const sectionSchema = z.object({
 });
 
 const createPostSchema = z.object({
-  title: z.string().min(1, "Başlık gerekli"),
+  title: z.string().min(1, "Title is required"),
   sections: z.array(sectionSchema),
-  categoryId: z.string().min(1, "Kategori gerekli"),
+  categoryId: z.string().min(1, "Category is required"),
   image: z.string().optional(),
 });
 
@@ -69,15 +69,15 @@ export default function CreatePostPage() {
   const createPost = trpc.post.createPost.useMutation({
     onSuccess: () => {
       toast({
-        title: "Başarılı",
-        description: "Blog yazısı başarıyla oluşturuldu",
+        title: "Success",
+        description: "Blog post created successfully",
       });
       router.push("/blog");
       router.refresh();
     },
     onError: (error) => {
       toast({
-        title: "Hata",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -109,8 +109,8 @@ export default function CreatePostPage() {
   } = trpc.category.getCategories.useQuery(undefined, {
     onError: (error) => {
       toast({
-        title: "Hata",
-        description: "Kategoriler yüklenirken bir hata oluştu",
+        title: "Error",
+        description: "Failed to load categories",
         variant: "destructive",
       });
     },
@@ -118,12 +118,12 @@ export default function CreatePostPage() {
 
   return (
     <div className="container max-w-2xl mx-auto mt-16 p-6">
-      <h1 className="text-2xl font-bold mb-6">Yeni Blog Yazısı</h1>
+      <h1 className="text-2xl font-bold mb-6">New Blog Post</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <Input
             {...register("title")}
-            placeholder="Başlık"
+            placeholder="Title"
             className="w-full"
           />
           {errors.title && (
@@ -142,8 +142,8 @@ export default function CreatePostPage() {
             <SelectTrigger>
               <SelectValue placeholder={
                 isCategoriesLoading 
-                  ? "Kategoriler yükleniyor..." 
-                  : "Kategori seçin"
+                  ? "Loading categories..." 
+                  : "Select category"
               } />
             </SelectTrigger>
             <SelectContent>
@@ -158,14 +158,14 @@ export default function CreatePostPage() {
             <p className="text-red-500 text-sm mt-1">{errors.categoryId.message}</p>
           )}
           {categoriesError && (
-            <p className="text-red-500 text-sm mt-1">Kategoriler yüklenirken bir hata oluştu</p>
+            <p className="text-red-500 text-sm mt-1">Failed to load categories</p>
           )}
         </div>
 
         <div>
           <Input
             {...register("image")}
-            placeholder="Kapak Görseli URL'si"
+            placeholder="Cover Image URL"
             className="w-full"
           />
           {errors.image && (
@@ -184,12 +184,12 @@ export default function CreatePostPage() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Bölüm tipi" />
+                    <SelectValue placeholder="Section type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="paragraph">Paragraf</SelectItem>
-                    <SelectItem value="heading">Başlık</SelectItem>
-                    <SelectItem value="image">Görsel</SelectItem>
+                    <SelectItem value="paragraph">Paragraph</SelectItem>
+                    <SelectItem value="heading">Heading</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -198,7 +198,7 @@ export default function CreatePostPage() {
                   variant="destructive"
                   onClick={() => removeSection(index)}
                 >
-                  Sil
+                  Delete
                 </Button>
               </div>
 
@@ -206,7 +206,7 @@ export default function CreatePostPage() {
                 <Input
                   value={section.imageUrl || ""}
                   onChange={(e) => updateSection(index, "imageUrl", e.target.value)}
-                  placeholder="Görsel URL'si"
+                  placeholder="Image URL"
                   className="mb-2"
                 />
               ) : null}
@@ -215,9 +215,9 @@ export default function CreatePostPage() {
                 value={section.content}
                 onChange={(e) => updateSection(index, "content", e.target.value)}
                 placeholder={
-                  section.type === "paragraph" ? "Paragraf içeriği..." :
-                  section.type === "heading" ? "Başlık içeriği..." :
-                  "Görsel açıklaması..."
+                  section.type === "paragraph" ? "Paragraph content..." :
+                  section.type === "heading" ? "Heading content..." :
+                  "Image description..."
                 }
                 className="w-full"
                 rows={section.type === "paragraph" ? 4 : 1}
@@ -232,21 +232,21 @@ export default function CreatePostPage() {
             variant="outline"
             onClick={() => addSection("paragraph")}
           >
-            Paragraf Ekle
+            Add Paragraph
           </Button>
           <Button 
             type="button" 
             variant="outline"
             onClick={() => addSection("heading")}
           >
-            Başlık Ekle
+            Add Heading
           </Button>
           <Button 
             type="button" 
             variant="outline"
             onClick={() => addSection("image")}
           >
-            Görsel Ekle
+            Add Image
           </Button>
         </div>
 
@@ -255,7 +255,7 @@ export default function CreatePostPage() {
           className="w-full"
           disabled={isLoading}
         >
-          {isLoading ? "Oluşturuluyor..." : "Blog Yazısı Oluştur"}
+          {isLoading ? "Creating..." : "Create Blog Post"}
         </Button>
       </form>
     </div>

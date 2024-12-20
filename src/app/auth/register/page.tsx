@@ -11,9 +11,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { trpc } from "@/utils/trpc";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
-  email: z.string().email("Geçerli bir email adresi giriniz"),
-  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -29,14 +29,14 @@ export default function RegisterPage() {
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
       toast({
-        title: "Kayıt başarılı",
-        description: "Giriş sayfasına yönlendiriliyorsunuz",
+        title: "Registration successful",
+        description: "Redirecting to login page",
       });
       router.push("/auth/login");
     },
     onError: (error) => {
       toast({
-        title: "Hata",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -54,12 +54,12 @@ export default function RegisterPage() {
 
   return (
     <div className="container max-w-md mx-auto mt-16 p-6">
-      <h1 className="text-2xl font-bold mb-6">Kayıt Ol</h1>
+      <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Input
             {...register("name")}
-            placeholder="İsim"
+            placeholder="Name"
             type="text"
           />
           {errors.name && (
@@ -79,7 +79,7 @@ export default function RegisterPage() {
         <div>
           <Input
             {...register("password")}
-            placeholder="Şifre"
+            placeholder="Password"
             type="password"
           />
           {errors.password && (
@@ -91,7 +91,7 @@ export default function RegisterPage() {
           className="w-full"
           disabled={isLoading}
         >
-          {isLoading ? "Kaydediliyor..." : "Kayıt Ol"}
+          {isLoading ? "Signing up..." : "Sign Up"}
         </Button>
       </form>
     </div>

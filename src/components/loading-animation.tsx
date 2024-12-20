@@ -26,7 +26,7 @@ export function LoadingAnimation() {
         transition={{ duration: 0.5 }}
         className="text-muted-foreground text-center max-w-md"
       >
-        Yükleniyor...
+        Loading...
       </motion.p>
     </div>
   );

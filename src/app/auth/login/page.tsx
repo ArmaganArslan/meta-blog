@@ -12,8 +12,8 @@ import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 
 const loginSchema = z.object({
-  email: z.string().email("Geçerli bir email adresi giriniz"),
-  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -36,8 +36,8 @@ export default function LoginPage() {
 
       if (result?.error) {
         toast({
-          title: "Hata",
-          description: "Email veya şifre hatalı",
+          title: "Error",
+          description: "Invalid email or password",
           variant: "destructive",
         });
         return;
@@ -52,7 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="container max-w-md mx-auto mt-16 p-6">
-      <h1 className="text-2xl font-bold mb-6">Giriş Yap</h1>
+      <h1 className="text-2xl font-bold mb-6">Sign In</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Input
@@ -67,7 +67,7 @@ export default function LoginPage() {
         <div>
           <Input
             {...register("password")}
-            placeholder="Şifre"
+            placeholder="Password"
             type="password"
           />
           {errors.password && (
@@ -79,18 +79,18 @@ export default function LoginPage() {
           className="w-full"
           disabled={isLoading}
         >
-          {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+          {isLoading ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
       <div className="mt-4 text-center">
         <span className="text-sm text-muted-foreground">
-          Hesabın yok mu?{" "}
+          Don't have an account?{" "}
           <Link 
             href="/auth/register" 
             className="text-primary hover:underline font-medium"
           >
-            Kayıt Ol
+            Sign Up
           </Link>
         </span>
       </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-background px-2 text-muted-foreground">
-              Veya şununla devam et
+              Or continue with
             </span>
           </div>
         </div>
