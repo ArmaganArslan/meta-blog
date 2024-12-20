@@ -1,21 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import BlogCard from "@/components/blog-card";
-import type { PostType } from "@/lib/types";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import BlogCard from "./blog-card";
+import { trpc } from "@/utils/trpc";
+import Link from "next/link";
+import { LoadingAnimation } from "@/components/loading-animation";
+import { type PostWithDetails } from "@/lib/types";
 
-interface BlogListProps {
-  initialPosts: PostType[];
+export function BlogList({ 
+  showViewAll = false, 
+  title 
+}: { 
   showViewAll?: boolean;
   title?: string;
-}
-
-export function BlogList({ initialPosts, showViewAll = false, title }: BlogListProps) {
+}) {
   const [displayCount, setDisplayCount] = useState(9);
+  const { data: posts, isLoading } = trpc.post.getPosts.useQuery<PostWithDetails[]>();
 
-  // Kart animasyonu için varyantlar
   const cardVariants = {
     hidden: { 
       opacity: 0, 
@@ -25,11 +27,21 @@ export function BlogList({ initialPosts, showViewAll = false, title }: BlogListP
       opacity: 1,
       y: 0,
       transition: {
-        delay: index * 0.1, // Her kart sırayla görünecek
+        delay: index * 0.1,
         duration: 0.5,
         ease: "easeOut"
       }
     })
+  };
+
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
+
+  const hasMorePosts = posts && posts.length > displayCount;
+
+  const loadMore = () => {
+    setDisplayCount((prev) => prev + 9);
   };
 
   return (
@@ -37,47 +49,59 @@ export function BlogList({ initialPosts, showViewAll = false, title }: BlogListP
       {title && <h2 className="text-2xl font-bold mb-8">{title}</h2>}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
-          {initialPosts.slice(0, displayCount).map((post, index) => (
-            <motion.div
-              key={post.id}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              custom={index % 9} // Her yeni yüklemede 0'dan başlayacak
-              layout // Smooth geçişler için
-            >
-              <BlogCard {...post} />
-            </motion.div>
-          ))}
+          {posts?.slice(0, displayCount).map((post, index) => {
+            return (
+              <motion.div
+                key={post.id}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                custom={index % 9}
+                layout
+              >
+                <BlogCard {...post} />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
-      
-      <div className="flex justify-center mt-8">
-        {showViewAll ? (
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link 
-              href="/blog"
-              className="px-6 py-2 border rounded-lg text-sm font-medium text-[#696A75] hover:bg-muted transition-colors"
+
+      {showViewAll ? (
+        <motion.div 
+          className="flex justify-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Link href="/blog">
+            <motion.button
+              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium border rounded-lg px-8 py-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              View All Post
-            </Link>
-          </motion.div>
-        ) : (
-          initialPosts.length > displayCount && (
-            <motion.button 
-              onClick={() => setDisplayCount(prev => prev + 9)}
-              className="px-6 py-2 border rounded-lg text-sm font-medium text-[#696A75] hover:bg-muted transition-colors"
+              View All Posts
+            </motion.button>
+          </Link>
+        </motion.div>
+      ) : (
+        hasMorePosts && (
+          <motion.div 
+            className="flex justify-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.button
+              onClick={loadMore}
+              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium border rounded-lg px-8 py-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Load More
             </motion.button>
-          )
-        )}
-      </div>
+          </motion.div>
+        )
+      )}
     </div>
   );
 } 

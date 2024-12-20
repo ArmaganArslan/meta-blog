@@ -1,55 +1,59 @@
 import "next-auth";
+import { type DefaultSession } from "next-auth";
+import { type Post, type User, type Category } from "@prisma/client";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
+    } & DefaultSession["user"];
   }
 }
 
 export interface Author {
+  id?: string;
+  name: string | null;
+  image: string | null;
+}
+
+export interface CategoryType {
+  id: string;
   name: string;
-  image: string;
+}
+
+export interface PostContent {
+  sections: Array<{
+    type: "paragraph" | "heading" | "image";
+    content: string;
+    imageUrl?: string;
+  }>;
 }
 
 export interface PostType {
   id: string;
-  category: string;
   title: string;
-  author: Author;
-  date: string;
-  image: string;
-}
-
-export interface PostContent {
-  sections: {
-    type: 'paragraph' | 'heading' | 'image';
-    content: string;
-    imageUrl?: string;
-  }[];
-}
-
-export interface Post {
-  id: string;
-  title: string;
-  content: string;
-  image?: string;
-  category: string;
+  content: PostContent;
+  image: string | null;
   createdAt: Date;
   updatedAt: Date;
-  authorId: string;
+  author: Author;
+  category: CategoryType;
 }
 
-export interface PrismaPost extends Omit<Post, 'content'> {
-  content: string;
-  author: {
-    id: string;
-    name: string | null;
-    email: string | null;
-    image: string | null;
-  };
+export type PostWithDetails = Post & {
+  author: User;
+  category: Category;
+  content: PostContent;
+};
+
+export interface AuthorInfoProps {
+  author: Author;
+  date: string;
+  className?: string;
+}
+
+export interface CategoryBadgeProps {
+  category: CategoryType;
+  variant?: "default" | "featured" | "primary" | "secondary";
+  className?: string;
 }

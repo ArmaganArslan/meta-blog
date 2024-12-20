@@ -19,7 +19,7 @@ model Account {
   token_type        String?
   scope             String?
   id_token          String? @db.Text
-  session_state     String?
+  session_token     String? @db.Text
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -40,6 +40,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  password      String?
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
@@ -52,7 +53,8 @@ model Post {
   title     String
   content   Json     @db.JsonB
   image     String?
-  category  String
+  category  Category @relation(fields: [categoryId], references: [id])
+  categoryId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id])
@@ -63,4 +65,12 @@ model Newsletter {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

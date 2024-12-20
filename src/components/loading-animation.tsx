@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Code, Coffee } from "lucide-react";
+import { CircleDashed } from "lucide-react";
 
 export function LoadingAnimation() {
   return (
@@ -9,6 +9,7 @@ export function LoadingAnimation() {
       <motion.div
         animate={{
           rotate: 360,
+          scale: [1, 1.1, 1],
         }}
         transition={{
           duration: 2,
@@ -17,15 +18,16 @@ export function LoadingAnimation() {
         }}
         className="mb-8"
       >
-        <div className="flex items-center space-x-4">
-          <Code className="w-8 h-8 text-primary" />
-          <Coffee className="w-8 h-8 text-primary" />
-        </div>
+        <CircleDashed size={48} className="text-primary" />
       </motion.div>
-      <h1 className="text-2xl font-bold mb-4">Sayfa Yapım Aşamasında</h1>
-      <p className="text-muted-foreground text-center max-w-md">
-        Bu sayfa şu anda geliştiriliyor. Çok yakında burada harika içerikler olacak!
-      </p>
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-muted-foreground text-center max-w-md"
+      >
+        Yükleniyor...
+      </motion.p>
     </div>
   );
 } 

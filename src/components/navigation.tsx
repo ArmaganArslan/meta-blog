@@ -2,22 +2,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { trpc } from '@/utils/trpc';
+import { type PostWithDetails } from "@/lib/types";
 
 export function Navigation() {
   const router = useRouter();
 
-  const handleRandomPost = async () => {
-    try {
-      const response = await fetch("/api/posts/random");
-      const post = await response.json();
-      
-      if (post.id) {
+  const { mutate: getRandomPost } = trpc.post.getRandomPost.useMutation({
+    onSuccess: (post: PostWithDetails | null) => {
+      if (post?.id) {
         router.push(`/blog/${post.id}`);
       }
-    } catch (error) {
-      console.error("Rastgele post getirilirken hata oluştu:", error);
-    }
-  };
+    },
+  });
 
   return (
     <nav className="hidden lg:flex flex-1 justify-center">
@@ -26,7 +23,7 @@ export function Navigation() {
         <li><Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors">Blog</Link></li>
         <li>
           <button 
-            onClick={handleRandomPost} 
+            onClick={() => getRandomPost()}
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Single Post

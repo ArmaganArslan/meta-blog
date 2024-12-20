@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { trpc } from "@/utils/trpc";
 import { Mail } from "lucide-react";
-import { motion } from "framer-motion";
 
 const newsletterSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -20,72 +20,56 @@ export function NewsletterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<NewsletterForm>({
+  const { mutate: subscribe } = trpc.newsletter.subscribe.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "You have successfully subscribed to our newsletter.",
+      });
+      reset();
+    },
+    onError: () => {
+      toast({
+        title: "Error!",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
+  });
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<NewsletterForm>({
     resolver: zodResolver(newsletterSchema),
   });
 
-  async function onSubmit(data: NewsletterForm) {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("An error occurred");
-      }
-
-      toast({
-        title: "Success!",
-        description: "You have been subscribed to our newsletter.",
-      });
-      reset();
-    } catch (error) {
-      toast({
-        title: "Error!",
-        description: "Failed to subscribe to newsletter.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const onSubmit = async (data: NewsletterForm) => {
+    setIsLoading(true);
+    subscribe({ email: data.email });
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <div className="relative">
-          <Input
-            type="email"
-            placeholder="Your Email"
-            {...register("email")}
-            className={`${errors.email ? "border-red-500" : ""} pr-10 text-sm`}
-          />
-          <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
-        {errors.email && (
-          <p className="text-sm text-red-500">{errors.email.message}</p>
-        )}
+      <div className="relative">
+        <Input
+          {...register("email")}
+          type="email"
+          placeholder="Your Email"
+          className={`${errors.email ? "border-red-500" : ""} pr-10`}
+        />
+        <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       </div>
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+      {errors.email && (
+        <p className="text-red-500 text-sm">{errors.email.message}</p>
+      )}
+      <Button 
+        type="submit" 
+        disabled={isLoading} 
+        className="w-full bg-[#4B6BFB] hover:bg-[#3b4cd0] hover:scale-[1.02] transition-all text-white"
       >
-        <Button 
-          type="submit" 
-          className="w-full bg-[#4B6BFB] hover:bg-[#4B6BFB]/90 text-white" 
-          disabled={isLoading}
-        >
-          {isLoading ? "Subscribing..." : "Subscribe"}
-        </Button>
-      </motion.div>
+        {isLoading ? "Subscribing..." : "Subscribe"}
+      </Button>
     </form>
   );
 } 

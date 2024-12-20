@@ -39,6 +39,7 @@ MetaBlog, Next.js 14 ve TypeScript ile geliştirilmiş modern bir blog platformu
 - Next.js 14
 - TypeScript
 - Prisma
+- tRPC
 - Tailwind CSS
 - shadcn/ui
 - Framer Motion

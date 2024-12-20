@@ -4,28 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { CategoryBadge } from "@/components/ui/category-badge";
 import { AuthorInfo } from "@/components/author-info";
+import { type PostType } from "@/lib/types";
 
-interface HeroSectionProps {
-  post: {
-    id: string;
-    title: string;
-    category: string;
-    image: string | null;
-    createdAt: Date;
-    author: {
-      name: string | null;
-      image: string | null;
-    };
-  };
-}
-
-export function HeroSection({ post }: HeroSectionProps) {
+export function HeroSection({ post }: { post: PostType }) {
   return (
     <div className="container max-w-7xl mx-auto px-6">
       <Link href={`/blog/${post.id}`} className="block">
         <section className="relative h-[500px] w-full rounded-xl overflow-hidden group">
           <Image
-            src={post.image || ""}
+            src={post.image || "/placeholder-image.jpg"}
             alt={post.title}
             fill
             priority
@@ -35,9 +22,9 @@ export function HeroSection({ post }: HeroSectionProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60">
             <div className="absolute bottom-12 left-12 right-12">
               <CategoryBadge 
-                category={post.category} 
-                variant="featured" 
-                className="mb-4 bg-[#4B6BFB] text-white hover:bg-[#4B6BFB]" 
+                category={post.category}
+                variant="primary"
+                className="mb-4"
               />
               <h1 className="text-4xl font-bold text-white mb-6 max-w-3xl">
                 {post.title}

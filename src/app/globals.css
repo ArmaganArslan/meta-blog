@@ -68,12 +68,10 @@
   }
 }
 
-/* Hydration hatası için */
 [data-theme] {
   @apply transition-none;
 }
 
-/* Tema geçişleri için */
 .theme-transition {
   transition: background-color var(--theme-transition-duration) ease-in-out,
               color var(--theme-transition-duration) ease-in-out,

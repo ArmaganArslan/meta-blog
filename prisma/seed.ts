@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Mevcut test kullanıcısını oluştur
+
   const testUser = await prisma.user.upsert({
     where: {
       email: "test@example.com",
@@ -16,7 +16,27 @@ async function main() {
     }
   });
 
-  // Mevcut postları temizle
+
+  const categories = [
+    { id: 'technology', name: 'Technology' },
+    { id: 'development', name: 'Development' },
+    { id: 'design', name: 'Design' },
+    { id: 'blockchain', name: 'Blockchain' },
+    { id: 'programming', name: 'Programming' },
+    { id: 'cloud', name: 'Cloud' },
+    { id: 'devops', name: 'DevOps' },
+    { id: 'ai', name: 'AI' }
+  ];
+
+  for (const category of categories) {
+    await prisma.category.upsert({
+      where: { id: category.id },
+      update: {},
+      create: category
+    });
+  }
+
+
   await prisma.post.deleteMany({
     where: {
       authorId: testUser.id
@@ -63,9 +83,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
-      category: "Technology",
-      authorId: testUser.id
+      categoryId: "technology",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
     },
     {
       title: "Understanding Modern Web Architecture",
@@ -102,9 +122,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
-      category: "Development",
-      authorId: testUser.id
+      categoryId: "development",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f"
     },
     {
       title: "The Rise of Web3 Technologies",
@@ -141,9 +161,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0",
-      category: "Blockchain",
-      authorId: testUser.id
+      categoryId: "blockchain",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0"
     },
     {
       title: "Mastering TypeScript in 2024",
@@ -180,9 +200,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea",
-      category: "Programming",
-      authorId: testUser.id
+      categoryId: "programming",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea"
     },
     {
       title: "Building Scalable NextJS Applications",
@@ -215,9 +235,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1618761714954-0b8cd0026356",
-      category: "Development",
-      authorId: testUser.id
+      categoryId: "development",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1618761714954-0b8cd0026356"
     },
     {
       title: "The Impact of AI on UX Design",
@@ -242,9 +262,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94",
-      category: "Design",
-      authorId: testUser.id
+      categoryId: "design",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94"
     },
     {
       title: "Optimizing React Performance",
@@ -277,9 +297,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
-      category: "Programming",
-      authorId: testUser.id
+      categoryId: "programming",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71"
     },
     {
       title: "The Evolution of CSS Architecture",
@@ -312,9 +332,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19",
-      category: "Design",
-      authorId: testUser.id
+      categoryId: "design",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19"
     },
     {
       title: "Serverless Computing: The Future of Backend Development",
@@ -347,9 +367,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
-      category: "Cloud",
-      authorId: testUser.id
+      categoryId: "cloud",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa"
     },
     {
       title: "GraphQL vs REST: Modern API Design",
@@ -382,9 +402,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31",
-      category: "Development",
-      authorId: testUser.id
+      categoryId: "development",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31"
     },
     {
       title: "DevOps Pratikleri ve Sürekli Entegrasyon",
@@ -417,9 +437,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb",
-      category: "DevOps",
-      authorId: testUser.id
+      categoryId: "devops",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb"
     },
     {
       title: "Yapay Zeka ile Kod İncelemesi",
@@ -452,9 +472,9 @@ async function main() {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c",
-      category: "AI",
-      authorId: testUser.id
+      categoryId: "ai",
+      authorId: testUser.id,
+      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c"
     }
   ].map(post => ({
     ...post,
@@ -463,7 +483,13 @@ async function main() {
 
   for (const post of posts) {
     await prisma.post.create({
-      data: post
+      data: {
+        title: post.title,
+        content: post.content,
+        categoryId: post.categoryId,
+        authorId: post.authorId,
+        image: post.image
+      }
     });
   }
 

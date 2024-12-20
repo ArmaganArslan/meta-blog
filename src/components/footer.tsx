@@ -20,7 +20,7 @@ export function Footer() {
       <div className="container max-w-7xl mx-auto px-6">
         {/* Üst Bölüm */}
         <div className="grid grid-cols-12 gap-8 mb-16">
-          {/* 1. Kısım - About */}
+          {/* About */}
           <div className="col-span-12 md:col-span-4 md:mr-8">
             <div className="max-w-[85%]">
               <h3 className="font-semibold mb-4">About</h3>
@@ -40,7 +40,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* 2. Kısım - Quick Link ve Category */}
+          {/* Quick Link ve Category */}
           <div className="col-span-12 md:col-span-4 grid grid-cols-2 gap-8">
             {/* Quick Link */}
             <div>
@@ -71,7 +71,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* 3. Kısım - Weekly Newsletter */}
+          {/* Weekly Newsletter */}
           <div className="col-span-12 md:col-span-4 flex justify-center md:justify-start">
             <div className="bg-background dark:bg-[#242535] p-6 rounded-xl max-w-[90%] md:max-w-full">
               <h3 className="text-lg font-medium mb-2 text-center">Weekly Newsletter</h3>
@@ -85,7 +85,7 @@ export function Footer() {
 
         {/* Alt Bölüm */}
         <div className="pt-8 border-t border-border grid grid-cols-12 gap-4 items-center">
-          {/* 1. Kısım - Logo ve Copyright */}
+          {/* Logo ve Copyright */}
           <div className="col-span-12 md:col-span-6">
             <div className="flex items-start">
               <img 
@@ -105,7 +105,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* 2. Kısım - Policy Links */}
+          {/* Policy Links */}
           <div className="col-span-12 md:col-span-6 flex justify-end">
             <div className="flex items-center space-x-4">
               {["Terms of Use", "Privacy Policy", "Cookie Policy"].map((item, index, array) => (
