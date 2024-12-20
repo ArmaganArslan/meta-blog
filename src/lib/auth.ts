@@ -74,59 +74,39 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
       }
       return session;
-    }
-  },
-  events: {
+    },
     async signIn({ user, account, profile }) {
-      if (account?.provider !== "credentials") {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            name: profile?.name || user.name,
-            image: profile?.image || user.image,
-            email: profile?.email || user.email,
-          },
-        });
-      } else {
-        const existingAccount = await prisma.account.findFirst({
-          where: {
-            userId: user.id,
-            provider: "credentials",
-          },
-        });
-
-        if (!existingAccount) {
-          await prisma.account.create({
-            data: {
-              userId: user.id,
-              type: "credentials",
-              provider: "credentials",
-              providerAccountId: user.id,
-            },
-          });
-        }
+      if (!account) {
+        account = {
+          provider: "credentials",
+          type: "credentials",
+          providerAccountId: user.id,
+        };
       }
 
-      const existingSession = await prisma.session.findFirst({
-        where: { userId: user.id }
+      const existingAccount = await prisma.account.findFirst({
+        where: {
+          userId: user.id,
+          provider: account.provider,
+        },
       });
 
-      if (existingSession) {
-        await prisma.session.update({
-          where: { id: existingSession.id },
+      if (!existingAccount) {
+        await prisma.account.create({
           data: {
-            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          }
-        });
-      } else {
-        await prisma.session.create({
-          data: {
-            sessionToken: Math.random().toString(36).substring(2),
             userId: user.id,
-            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          }
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId || user.id,
+            access_token: account.access_token,
+            token_type: account.token_type,
+            scope: account.scope,
+            expires_at: account.expires_at,
+          },
         });
       }
-    }
+
+      return true;
+    },
   },
 }; 
