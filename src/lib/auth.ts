@@ -9,7 +9,10 @@ import { randomUUID } from "crypto";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  debug: true,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 60,
+  },
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
@@ -31,13 +34,8 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            password: true,
-            image: true
+          where: {
+            email: credentials.email
           }
         });
 
@@ -51,27 +49,51 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email veya şifre hatalı");
         }
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        };
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account, trigger }) {
+      if (trigger === "signIn" && user) {
+        const sessionToken = randomUUID();
+        
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
+        
+        try {
+          await prisma.session.create({
+            data: {
+              sessionToken: sessionToken,
+              userId: user.id,
+              expires: new Date(Date.now() + 30 * 60 * 1000),
+            },
+          });
+        } catch (error) {
+          console.error("Session creation error:", error);
+        }
       }
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = user?.id || token.id as string;
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
       }
       return session;
     }
   },
   events: {
     async signIn({ user }) {
-      // Önce süresi geçmiş session'ları temizle
       await prisma.session.deleteMany({
         where: {
           OR: [
@@ -81,9 +103,8 @@ export const authOptions: NextAuthOptions = {
         }
       });
 
-      // Yeni session oluştur - 30 dakika
       const sessionToken = randomUUID();
-      const expires = new Date(Date.now() + 30 * 60 * 1000); // 30 dakika
+      const expires = new Date(Date.now() + 30 * 60 * 1000);
 
       await prisma.session.create({
         data: {
@@ -92,14 +113,19 @@ export const authOptions: NextAuthOptions = {
           expires
         }
       });
+    },
+    async signOut({ session }) {
+      if (session?.user?.id) {
+        await prisma.session.deleteMany({
+          where: {
+            userId: session.user.id
+          }
+        });
+      }
     }
   },
   pages: {
     signIn: "/auth/login",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 60, // 30 dakika (saniye cinsinden)
   },
   secret: process.env.NEXTAUTH_SECRET,
 }; 

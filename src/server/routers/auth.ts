@@ -39,6 +39,15 @@ export const authRouter = router({
         },
       });
 
+      await prisma.account.create({
+        data: {
+          userId: user.id,
+          type: "credentials",
+          provider: "credentials",
+          providerAccountId: user.id,
+        },
+      });
+
       return { success: true, user };
     }),
 }); 
