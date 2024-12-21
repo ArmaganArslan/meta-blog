@@ -5,12 +5,11 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
-import { randomUUID } from "crypto";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt",
+    strategy: "database",
     maxAge: 24 * 60 * 60,
   },
   providers: [
@@ -59,35 +58,12 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user, account, trigger }) {
-      if (trigger === "signIn" && user) {
-        const sessionToken = randomUUID();
-        
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image;
-        
-        try {
-          await prisma.session.create({
-            data: {
-              sessionToken: sessionToken,
-              userId: user.id,
-              expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            },
-          });
-        } catch (error) {
-          console.error("Session creation error:", error);
-        }
-      }
-      return token;
-    },
-    async session({ session, token }) {
+    async session({ session, user }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
-        session.user.image = token.picture as string;
+        session.user.id = user.id;
+        session.user.email = user.email;
+        session.user.name = user.name;
+        session.user.image = user.image;
       }
       return session;
     },
